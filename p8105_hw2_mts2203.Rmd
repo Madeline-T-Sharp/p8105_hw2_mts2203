@@ -14,18 +14,26 @@ output: github_document
 library(tidyverse)
 ```
 
-## Reading the data
+## Reading and cleaning the data
 
 ``` {r reading_data, message = F}  
-# importing the NYC Transit csv data
+# importing anc cleaning the NYC Transit csv data
 nyc_transit_df = 
   read_csv(
     file = paste0(
       "p8105_hw2_mts2203_files/",
-      "NYC_Transit_Subway_Entrance_And_Exit_Data.csv"
-      ), 
+      "NYC_Transit_Subway_Entrance_And_Exit_Data.csv"), 
     na = c("", "NA", ".")
+    ) |>
+  janitor::clean_names() |>
+  select(line, station_name, station_latitude,  station_longitude, route1, 
+         route2, route3, route4, route5, route6, route7, route8, route9, 
+         route10, route11, entry, vending, entrance_type, ada) |>
+  mutate (
+    entry = case_match(
+      entry,
+      "YES" ~ TRUE,
+      "NO" ~ FALSE
+    )
   )
 ```
-
-## Cleaning the data
