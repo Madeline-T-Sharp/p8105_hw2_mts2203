@@ -26,9 +26,10 @@ nyc_transit_df =
     na = c("", "NA", ".")
     ) |>
   janitor::clean_names() |>
-  select(line, station_name, station_latitude,  station_longitude, route1, 
-         route2, route3, route4, route5, route6, route7, route8, route9, 
-         route10, route11, entry, vending, entrance_type, ada) |>
+  select(line, station_name, station_latitude,  station_longitude, 
+         starts_with("route"), 
+         entry, vending, entrance_type, ada
+         ) |>
   mutate (
     entry = case_match(
       entry,
@@ -40,14 +41,14 @@ nyc_transit_df =
 
 ## Short paragraph about the dataset
 
-The `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset contains variables `r paste(names(read_csv("p8105_hw2_mts2203_files/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")), collapse = ", ")`. I created data frame `nyc_transit_df` to import and clean the data from the `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset. First, I used `read_csv()` read the csv file, second, I standardized the column names using `janitor::clean_names()`, third, I selected for the columns `r paste(names(nyc_transit_df), collapse = ", ")`, and finally I used the `mutate()` function to change the `entry` column data type from `character` to `logical`. The function `case_match()` was essential to accomplishing the last task. The resulting `nyc_transit_df` dataset's dimensions are`r nrow(nyc_transit_df)` rows by `r ncol(nyc_transit_df)` columns. No, this data is not yet tidy. There are too many route columns and the vending column could be a logical instead of a character data type.
+The `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset contains variables `r paste(names(read_csv("p8105_hw2_mts2203_files/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")), collapse = ", ")`. I created data frame `nyc_transit_df` to import and clean the data from the `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset. First, I used `read_csv()` read the csv file, second, I standardized the column names using `janitor::clean_names()`, third, I selected for the columns `r paste(names(nyc_transit_df), collapse = ", ")`, and finally I used the `mutate()` function to change the `entry` column data type from `character` to `logical`. The function `case_match()` was essential to accomplishing the last task. The resulting `nyc_transit_df` dataset's dimensions are`r nrow(nyc_transit_df)` rows by `r ncol(nyc_transit_df)` columns. No, this data is not yet tidy. The route columns should be better consolidated, the vending column could be a logical instead of a character data type, and the missing values have not been dealt with.
 
 ## Addressing questions
 
 ``` {r answering_questions, message = F}  
 # finding the number of distinct stations
 nyc_transit_df |>
-  distinct(station_name, line) |>
+  distinct(station_name, line) |> 
   nrow()
 
 # finding the number of stations that are ADA compliant
@@ -60,5 +61,24 @@ nyc_transit_df |>
 nyc_transit_df |>
   filter(vending == "NO") |>
   summarise(proportion = mean(entry, na.rm = TRUE))
+```
+
+## Reformatting data
+
+``` {r reformatting_data}  
+nyc_transit_routes = 
+  nyc_transit_df |>
+  mutate(
+    across(
+      starts_with("route"), as.character
+      )
+    ) |>
+  pivot_longer(
+    route1:route11,
+    names_to = "route_number",
+    names_prefix = "route",
+    values_to = "route_name"
+  ) |>
+  drop_na(route_name)
 ```
 
