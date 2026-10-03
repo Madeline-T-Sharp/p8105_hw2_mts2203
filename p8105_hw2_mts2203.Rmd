@@ -65,7 +65,8 @@ nyc_transit_df |>
 
 ## Reformatting data
 
-``` {r reformatting_data}  
+``` {r reformatting_data, message = F}  
+# reformatting data to make route number ad route name distinct variables
 nyc_transit_routes = 
   nyc_transit_df |>
   mutate(
@@ -82,3 +83,18 @@ nyc_transit_routes =
   drop_na(route_name)
 ```
 
+## Answering questions with reformatted data
+
+``` {r answering_route_questions_with_reformatted_data, message = F}  
+# finding the number of distinct stations that serve the A train
+nyc_transit_routes |>
+  distinct(station_name, line, route_name) |>
+  filter(route_name == "A") |>
+  nrow()
+
+# finding the number of ADA compliant stations that serve the A train
+nyc_transit_routes |>
+  distinct(station_name, line, route_name, ada) |>
+  filter(route_name == "A", ada == TRUE) |>
+  nrow()
+```
