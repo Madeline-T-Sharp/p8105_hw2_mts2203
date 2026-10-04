@@ -169,7 +169,7 @@ gwynns_falls_tw_df =
 mr_tw_df = mr_tw_df |>
   mutate(
     year = as.numeric(year),
-    tw_df = "Mr. Trash Wheel"
+    trash_wheel = "Mr. Trash Wheel"
   )
 
 # adding a variable identifying the Professor Trash Wheel dataset
@@ -177,7 +177,7 @@ mr_tw_df = mr_tw_df |>
 prof_tw_df = prof_tw_df |>
   mutate(
     year = as.numeric(year),
-    tw_df = "Professor Trash Wheel"
+    trash_wheel = "Professor Trash Wheel"
   )
 
 # adding a variable identifying the Gwynns Falls Trash Wheel dataset
@@ -185,10 +185,17 @@ prof_tw_df = prof_tw_df |>
 gwynns_falls_tw_df = gwynns_falls_tw_df |>
   mutate(
     year = as.numeric(year),
-    tw_df = "Gwynns Falls Trash Wheel"
+    trash_wheel = "Gwynns Falls Trash Wheel"
   )
 
 # combining all three datasets
 tw_df = bind_rows(mr_tw_df, prof_tw_df, gwynns_falls_tw_df) |>
-  relocate(tw_df)
+  relocate(trash_wheel)
 ```
+
+## Paragraph about Problem 2 data
+
+The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key variables are `r ncol(tw_df)`. Given the available data, the total weight of trash collected by Professor Trash Wheel `r tw_df |> filter(trash_wheel == "Professor Trash Wheel") |> pull(weight_tons) |> sum(na.rm = TRUE)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is  `r tw_df |> filter(trash_wheel == "Gwynns Falls Trash Wheel", month == "June", year == 2022) |> pull(cigarette_butts) |> sum(na.rm = TRUE)`.
+
+
+# Problem 3
