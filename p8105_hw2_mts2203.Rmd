@@ -119,5 +119,5 @@ mr_trash_wheel_df =
   filter(!is.na(dumpster)) |>
   mutate(
     sports_balls = as.integer(round(sports_balls))
-    )
+  )
 ```
