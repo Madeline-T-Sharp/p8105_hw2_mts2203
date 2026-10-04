@@ -199,3 +199,35 @@ The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key v
 
 
 # Problem 3
+
+## Reading and cleaning the Problem 3 data
+
+``` {r reading_and_tidying_p3_data, message = F}  
+# importing and tidying MCI_baseline csv data
+mci_baseline_df =
+  read_csv(
+    file = paste0(
+      "p8105_hw2_mts2203_files/",
+      "MCI_baseline.csv"),
+    skip = 1,
+    na = c("", "NA", ".")
+  ) |>
+  janitor::clean_names() |>
+  mutate(
+    sex = case_match(
+      sex, 
+      1 ~ "male",
+      0 ~ "female"
+    ),
+    apoeE4 = case_match(
+      apoe4,
+      1 ~ "carrier",
+      0 ~ "non-carrier"
+    )
+  ) |>
+  filter(
+    age_at_onset > current_age | is.na(age_at_onset)
+  )
+```
+
+
