@@ -105,7 +105,7 @@ nyc_transit_routes |>
 ## Reading and cleaning the Problem 2 data
 
 ```{r reading_and_cleaning_p2_data, message = F}
-#importing and cleaning the Mr. Trash Wheel excel sheet data
+# importing and cleaning the Mr. Trash Wheel excel sheet data
 mr_tw_df =
   readxl::read_excel(
     paste0(
@@ -128,7 +128,7 @@ mr_tw_df =
 ## Reading, cleaning and organizing more Problem 2 data
 
 ```{r organizing_other_p2_data, message = F}
-#importing and organizing the Professor Trash Wheel excel sheet data
+# importing and organizing the Professor Trash Wheel excel sheet data
 prof_tw_df = 
   readxl::read_excel(
     paste0(
@@ -144,7 +144,7 @@ prof_tw_df =
     !is.na(dumpster)
   )
 
-#importing and organizing the Gwynn Falls Trash Wheel excel sheet data
+# importing and organizing the Gwynns Falls Trash Wheel excel sheet data
 gwynns_falls_tw_df = 
   readxl::read_excel(
     paste0(
@@ -159,4 +159,36 @@ gwynns_falls_tw_df =
   filter(
     !is.na(dumpster)
   )
+```
+
+## Combining Problem 2 datasets into a single tidy dataset
+
+```{r combining_all_tw_datasets, message = F}
+# adding a variable identifying the Mr. Trash Wheel dataset
+# standardizing the year variable
+mr_tw_df = mr_tw_df |>
+  mutate(
+    year = as.numeric(year),
+    tw_df = "Mr. Trash Wheel"
+  )
+
+# adding a variable identifying the Professor Trash Wheel dataset
+# standardizing the year variable
+prof_tw_df = prof_tw_df |>
+  mutate(
+    year = as.numeric(year),
+    tw_df = "Professor Trash Wheel"
+  )
+
+# adding a variable identifying the Gwynns Falls Trash Wheel dataset
+# standardizing the year variable
+gwynns_falls_tw_df = gwynns_falls_tw_df |>
+  mutate(
+    year = as.numeric(year),
+    tw_df = "Gwynns Falls Trash Wheel"
+  )
+
+# combining all three datasets
+tw_df = bind_rows(mr_tw_df, prof_tw_df, gwynns_falls_tw_df) |>
+  relocate(tw_df)
 ```
