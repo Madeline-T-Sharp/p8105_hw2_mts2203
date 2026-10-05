@@ -219,7 +219,7 @@ mci_baseline_df =
       1 ~ "male",
       0 ~ "female"
     ),
-    apoeE4 = case_match(
+    apoe4 = case_match(
       apoe4,
       1 ~ "carrier",
       0 ~ "non-carrier"
@@ -230,4 +230,10 @@ mci_baseline_df =
   )
 ```
 
+## Discussing the MCI baseline demographics dataset import and features
 
+The MCI_baseline.csv dataset was imported as `mci_baseline_df`. To import the csv file, I used the `read_csv()` `tidy` function. To clean the data, first skipped the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `mutate()` function, with `case_match()` nested within it, to recode their values; thus, amplifying their clarity To ensure that all participants met then 'no MCI at baseline' criterion, I used the `filter()` function to isolate those whose `age_at_onset` exceeded `current_age`, as well as those who remained MCI free after follow-up, i.e., the NAs. In other efforts to clean this dataset, I standardized across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. In summary, `r nrow(mci_baseline_df)` participants were recruited, `r mci_baseline_df |> filter(!is.na(age_at_onset)) |> nrow()` of them developed MCI, `r mci_baseline_df |> summarise(mean_age = mean(current_age, na.rm = TRUE))` was the average baseline age, and `r mci_baseline_df |> filter(sex == "female") |> summarise(carrier = mean(apoe4 == "carrier", na.rm = TRUE))` was the proportion of women in the study who were APOE4 carriers.
+
+## Reading and cleaning more Problem 3 data
+```{r reading_and_tidying_biomarker_data, message = F}
+# importing and tidying mci_amyloid csv data
