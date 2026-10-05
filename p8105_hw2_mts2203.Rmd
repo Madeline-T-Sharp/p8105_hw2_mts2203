@@ -288,7 +288,7 @@ mci_df =
 
 The resulting `mci_df` dataset is a combination of the `mci_baseline_df` and the `mci_amyloid` datasets where only participants who appear in both datasets are retained. To do this, the `inner_join()` function was applied to both, with the `id` variable anchoring the datasets to one another. Altogether, the `mci_df` dataset has `r nrow(mci_df)` rows and `r ncol(mci_df)` columns. Its column variables include `r paste(names(mci_df), collapse = ", ")`.
 
-## Exporting result as a CSV to my github data directory
+## Exporting result as a csv to my github data directory
 
 ```{r exporting_combined_csv, message = F}
 write_csv(mci_df, "p8105_hw2_mts2203_files/mci_df.csv")
