@@ -195,7 +195,7 @@ tw_df = bind_rows(mr_tw_df, prof_tw_df, gwynns_falls_tw_df) |>
 
 ## Paragraph about Problem 2 data
 
-The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key variables are `r ncol(tw_df)`. Given the available data, the total weight of trash collected by Professor Trash Wheel `r tw_df |> filter(trash_wheel == "Professor Trash Wheel") |> pull(weight_tons) |> sum(na.rm = TRUE)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is  `r tw_df |> filter(trash_wheel == "Gwynns Falls Trash Wheel", month == "June", year == 2022) |> pull(cigarette_butts) |> sum(na.rm = TRUE)`.
+The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key variables are `r paste(names(tw_df), collapse = ", ")`. Given the available data, the total weight of trash collected by Professor Trash Wheel `r tw_df |> filter(trash_wheel == "Professor Trash Wheel") |> pull(weight_tons) |> sum(na.rm = TRUE)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is  `r tw_df |> filter(trash_wheel == "Gwynns Falls Trash Wheel", month == "June", year == 2022) |> pull(cigarette_butts) |> sum(na.rm = TRUE)`.
 
 
 # Problem 3
@@ -232,8 +232,64 @@ mci_baseline_df =
 
 ## Discussing the MCI baseline demographics dataset import and features
 
-The MCI_baseline.csv dataset was imported as `mci_baseline_df`. To import the csv file, I used the `read_csv()` `tidy` function. To clean the data, first skipped the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `mutate()` function, with `case_match()` nested within it, to recode their values; thus, amplifying their clarity To ensure that all participants met then 'no MCI at baseline' criterion, I used the `filter()` function to isolate those whose `age_at_onset` exceeded `current_age`, as well as those who remained MCI free after follow-up, i.e., the NAs. In other efforts to clean this dataset, I standardized across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. In summary, `r nrow(mci_baseline_df)` participants were recruited, `r mci_baseline_df |> filter(!is.na(age_at_onset)) |> nrow()` of them developed MCI, `r mci_baseline_df |> summarise(mean_age = mean(current_age, na.rm = TRUE))` was the average baseline age, and `r mci_baseline_df |> filter(sex == "female") |> summarise(carrier = mean(apoe4 == "carrier", na.rm = TRUE))` was the proportion of women in the study who were APOE4 carriers.
+The MCI_baseline.csv dataset was imported as `mci_baseline_df`. To import the csv file, I used the `read_csv()` `tidy` function. To clean the data, first skipped the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `mutate()` function, with `case_match()` nested within it, to recode their values; thus, amplifying their clarity. To ensure that all participants met then 'no MCI at baseline' criterion, I used the `filter()` function to isolate those whose `age_at_onset` exceeded `current_age`, as well as those who remained MCI free after follow-up, i.e., the NAs. In other efforts to clean this dataset, I standardized across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. The tidy `mci_amyloid_df`dataset has `r nrow(mci_baseline_df)` rows and `r ncol(mci_baseline_df)` columns. These are its column variables: `r paste(names(mci_baseline_df), collapse = ", ")`. In summary, `r nrow(mci_baseline_df)` participants were recruited, `r mci_baseline_df |> filter(!is.na(age_at_onset)) |> nrow()` of them developed MCI, `r mci_baseline_df |> summarise(mean_age = mean(current_age, na.rm = TRUE))` was the average baseline age, and `r mci_baseline_df |> filter(sex == "female") |> summarise(carrier = mean(apoe4 == "carrier", na.rm = TRUE))` was the proportion of women in the study who were APOE4 carriers.
+
+
 
 ## Reading and cleaning more Problem 3 data
 ```{r reading_and_tidying_biomarker_data, message = F}
 # importing and tidying mci_amyloid csv data
+mci_amyloid_df =
+  read_csv(
+    file = paste0(
+      "p8105_hw2_mts2203_files/",
+      "mci_amyloid.csv"),
+    skip = 1,
+    na = c("", "NA", ".")
+  ) |>
+  janitor::clean_names() |>
+  rename(
+    id = study_id,
+    baseline_years = baseline
+  )
+```
+
+## Commenting on the mci_amyloid import process steps and dataset features
+
+The mci_amyloid.csv dataset was imported as `mci_amyloid_df`. To import the csv file, I used the `read_csv()` `tidy` function. To clean the data, first skipped the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `rename()` function to change their values either for clarity of measurement or for uniformity with `mci_baseline_df`. In other efforts to clean this dataset, I standardized across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. The tidy `mci_amyloid_df`dataset has `r nrow(mci_amyloid_df)` rows and `r ncol(mci_amyloid_df)` columns. These are its column variables: `r paste(names(mci_amyloid_df), collapse = ", ")`.
+
+## Checking participants between datasets
+
+```{r checking_for_participants, message = F}
+# Checking for participants in mci_baseline but not mci_amyloid
+mci_baseline_df |> 
+  anti_join(mci_amyloid_df, by = "id") |> 
+  nrow()
+
+# Checking for participants in mci_amyloid but not mci_baseline
+mci_amyloid_df |> 
+  anti_join(mci_baseline_df, by = "id") |> 
+  nrow()
+```
+
+## Commenting on participant check finding
+
+The `mci_baseline_df` dataset contains 8 participants who are not in the `mci_amyloid_df` dataset.
+The `mci_amyloid_df` dataset contains 16 participants who are not in the `mci_baseline_df` dataset.
+
+## Combining Problem 3 datasets
+
+```{r combining_p3_datasets, message = F}
+mci_df =
+  inner_join(mci_baseline_df, mci_amyloid_df, by = "id")
+```
+
+## Describing resulting dataset
+
+The resulting `mci_df` dataset is a combination of the `mci_baseline_df` and the `mci_amyloid` datasets where only participants who appear in both datasets are retained. To do this, the `inner_join()` function was applied to both, with the `id` variable anchoring the datasets to one another. Altogether, the `mci_df` dataset has `r nrow(mci_df)` rows and `r ncol(mci_df)` columns. Its column variables include `r paste(names(mci_df), collapse = ", ")`.
+
+## Exporting result as a CSV to my github data directory
+
+```{r exporting_combined_csv, message = F}
+write_csv(mci_df, "p8105_hw2_mts2203_files/mci_df.csv")
+```
