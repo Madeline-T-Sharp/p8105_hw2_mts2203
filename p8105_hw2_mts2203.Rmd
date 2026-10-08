@@ -17,7 +17,7 @@ library(tidyverse)
 ## Reading and cleaning the Problem 1 data
 
 ``` {r reading_and_cleaning_p1_data, message = F}  
-# importing and cleaning the NYC Transit csv data
+# importing and cleaning the NYC Transit CSV data
 nyc_transit_df = 
   read_csv(
     file = paste0(
@@ -41,7 +41,7 @@ nyc_transit_df =
 
 ## Short paragraph about the dataset
 
-The `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset contains variables `r paste(names(read_csv("p8105_hw2_mts2203_files/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")), collapse = ", ")`. I created data frame `nyc_transit_df` to import and clean the data from the `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset. First, I used `read_csv()` read the csv file, second, I standardized the column names using `janitor::clean_names()`, third, I selected for the columns `r paste(names(nyc_transit_df), collapse = ", ")`, and finally I used the `mutate()` function to change the `entry` column data type from `character` to `logical`. The function `case_match()` was essential to accomplishing the last task. The resulting `nyc_transit_df` dataset's dimensions are`r nrow(nyc_transit_df)` rows by `r ncol(nyc_transit_df)` columns. No, this data is not yet tidy. The route columns should be better consolidated, the vending column could be a logical instead of a character data type, and the missing values have not been dealt with.
+The `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset contains variables `r paste(names(read_csv("p8105_hw2_mts2203_files/NYC_Transit_Subway_Entrance_And_Exit_Data.csv")), collapse = ", ")`. I created data frame `nyc_transit_df` to import and clean the data from the `NYC_Transit_Subway_Entrance_And_Exit_Data.csv` dataset. First, I used `read_csv()` to read the CSV file, second, I standardized the column names using `janitor::clean_names()`, third, I selected for the columns `r paste(names(nyc_transit_df), collapse = ", ")`, and finally I used the `mutate()` function to change the `entry` column data type from `character` to `logical`. The function `case_match()` was essential to accomplishing the last task. The resulting `nyc_transit_df` dataset's dimensions are`r nrow(nyc_transit_df)` rows by `r ncol(nyc_transit_df)` columns. No, this data is not yet tidy. The route columns should be better consolidated, the vending column could be a logical instead of a character data type, and the missing values have not been dealt with.
 
 ## Addressing questions
 
@@ -144,7 +144,7 @@ prof_tw_df =
     !is.na(dumpster)
   )
 
-# importing and organizing the Gwynns Falls Trash Wheel excel sheet data
+# importing and organizing the Gwynnda Trash Wheel excel sheet data
 gwynnda_tw_df = 
   readxl::read_excel(
     paste0(
@@ -165,7 +165,7 @@ gwynnda_tw_df =
 
 ```{r combining_all_tw_datasets, message = F}
 # adding a variable identifying the Mr. Trash Wheel dataset
-# standardizing the year variable
+# standardizing the year and plastic_bottles variables
 mr_tw_df = mr_tw_df |>
   mutate(
     year = as.numeric(year),
@@ -174,7 +174,7 @@ mr_tw_df = mr_tw_df |>
   )
 
 # adding a variable identifying the Professor Trash Wheel dataset
-# standardizing the year variable
+# standardizing the year and plastic_bottles variables
 prof_tw_df = prof_tw_df |>
   mutate(
     year = as.numeric(year),
@@ -182,8 +182,8 @@ prof_tw_df = prof_tw_df |>
     trash_wheel = "Professor Trash Wheel"
   )
 
-# adding a variable identifying the Gwynns Falls Trash Wheel dataset
-# standardizing the year variable
+# adding a variable identifying the Gwynnda Trash Wheel dataset
+# standardizing the year and plastic_bottles variables
 gwynnda_tw_df = gwynnda_tw_df |>
   mutate(
     year = as.numeric(year),
@@ -198,7 +198,7 @@ tw_df = bind_rows(mr_tw_df, prof_tw_df, gwynnda_tw_df) |>
 
 ## Paragraph about Problem 2 data
 
-The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key variables are `r paste(names(tw_df), collapse = ", ")`. Given the available data, the total weight of trash collected by Professor Trash Wheel `r tw_df |> filter(trash_wheel == "Professor Trash Wheel") |> pull(weight_tons) |> sum(na.rm = TRUE)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is  `r tw_df |> filter(trash_wheel == "Gwynnda the Good Wheel of the W", month == "June", year == 2022) |> pull(cigarette_butts) |> sum(na.rm = TRUE)`.
+The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key variables are `r paste(names(tw_df), collapse = ", ")`. Given the available data, the total weight of trash collected by Professor Trash Wheel is `r tw_df |> filter(trash_wheel == "Professor Trash Wheel") |> pull(weight_tons) |> sum(na.rm = TRUE)` tons. The total number of cigarette butts collected by Gwynnda in June of 2022 is  `r tw_df |> filter(trash_wheel == "Gwynnda the Good Wheel of the W", month == "June", year == 2022) |> pull(cigarette_butts) |> sum(na.rm = TRUE)`.
 
 
 # Problem 3
@@ -206,7 +206,7 @@ The combined `tw_df` dataset consists of `r nrow(tw_df)` observations. The key v
 ## Reading and cleaning the Problem 3 data
 
 ``` {r reading_and_tidying_p3_data, message = F}  
-# importing and tidying MCI_baseline csv data
+# importing and tidying MCI_baseline CSV data
 mci_baseline_df =
   read_csv(
     file = paste0(
@@ -235,13 +235,13 @@ mci_baseline_df =
 
 ## Discussing the MCI baseline demographics dataset import and features
 
-The MCI_baseline.csv dataset was imported as `mci_baseline_df`. To import the csv file, I used the `read_csv()` `tidy` function. To clean the data, first skipped the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `mutate()` function, with `case_match()` nested within it, to recode their values; thus, amplifying their clarity. To ensure that all participants met then 'no MCI at baseline' criterion, I used the `filter()` function to isolate those whose `age_at_onset` exceeded `current_age`, as well as those who remained MCI free after follow-up, i.e., the NAs. In other efforts to clean this dataset, I standardized across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. The tidy `mci_amyloid_df`dataset has `r nrow(mci_baseline_df)` rows and `r ncol(mci_baseline_df)` columns. These are its column variables: `r paste(names(mci_baseline_df), collapse = ", ")`. In summary, `r nrow(mci_baseline_df)` participants were recruited, `r mci_baseline_df |> filter(!is.na(age_at_onset)) |> nrow()` of them developed MCI, `r mci_baseline_df |> summarise(mean_age = mean(current_age, na.rm = TRUE))` was the average baseline age, and `r mci_baseline_df |> filter(sex == "female") |> summarise(carrier = mean(apoe4 == "carrier", na.rm = TRUE))` was the proportion of women in the study who were APOE4 carriers.
+The MCI_baseline.csv dataset was imported as `mci_baseline_df`. To import the CSV file, I used the `read_csv()` `tidy` function. To clean the data, I began by skipping the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `mutate()` function, with `case_match()` nested within it, to recode their values; thus, amplifying their clarity. To ensure that all participants met the 'no MCI at baseline' criterion, I used the `filter()` function to isolate those whose `age_at_onset` exceeded `current_age`, as well as those who remained MCI free after follow-up, i.e., the NAs. In other efforts to clean this dataset, I standardized across variables several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. The tidy `mci_amyloid_df`dataset has `r nrow(mci_baseline_df)` rows and `r ncol(mci_baseline_df)` columns. These are its column variables: `r paste(names(mci_baseline_df), collapse = ", ")`. In summary, `r nrow(mci_baseline_df)` participants were recruited, `r mci_baseline_df |> filter(!is.na(age_at_onset)) |> nrow()` of them developed MCI, `r mci_baseline_df |> summarise(mean_age = mean(current_age, na.rm = TRUE))` was the average baseline age, and `r mci_baseline_df |> filter(sex == "female") |> summarise(carrier = mean(apoe4 == "carrier", na.rm = TRUE))` was the proportion of women in the study who were APOE4 carriers.
 
 
 
 ## Reading and cleaning more Problem 3 data
 ```{r reading_and_tidying_biomarker_data, message = F}
-# importing and tidying mci_amyloid csv data
+# importing and tidying mci_amyloid CSV data
 mci_amyloid_df =
   read_csv(
     file = paste0(
@@ -259,17 +259,17 @@ mci_amyloid_df =
 
 ## Commenting on the mci_amyloid import process steps and dataset features
 
-The mci_amyloid.csv dataset was imported as `mci_amyloid_df`. To import the csv file, I used the `read_csv()` `tidy` function. To clean the data, first skipped the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `rename()` function to change their values either for clarity of measurement or for uniformity with `mci_baseline_df`. In other efforts to clean this dataset, I standardized across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. The tidy `mci_amyloid_df`dataset has `r nrow(mci_amyloid_df)` rows and `r ncol(mci_amyloid_df)` columns. These are its column variables: `r paste(names(mci_amyloid_df), collapse = ", ")`.
+The mci_amyloid.csv dataset was imported as `mci_amyloid_df`. To import the CSV file, I used the `read_csv()` `tidy` function. To clean the data, I began by skipping the first line of the dataset. This line contained notes that were unnecessary to include considering the clarity of many column variable names. However, for those column variables without such clarity, I used the `rename()` function to change their values either for clarity of measurement or for uniformity with `mci_baseline_df`. In other efforts to clean this dataset, I standardized variables across several categories. These included the presentation of missing variables, and the presentation of column variables. The latter task was completed via the `clean_names()` function in the `janitor` package. The tidy `mci_amyloid_df`dataset has `r nrow(mci_amyloid_df)` rows and `r ncol(mci_amyloid_df)` columns. These are its column variables: `r paste(names(mci_amyloid_df), collapse = ", ")`.
 
 ## Checking participants between datasets
 
 ```{r checking_for_participants, message = F}
-# Checking for participants in mci_baseline but not mci_amyloid
+# checking for participants in mci_baseline but not mci_amyloid
 mci_baseline_df |> 
   anti_join(mci_amyloid_df, by = "id") |> 
   nrow()
 
-# Checking for participants in mci_amyloid but not mci_baseline
+# checking for participants in mci_amyloid but not mci_baseline
 mci_amyloid_df |> 
   anti_join(mci_baseline_df, by = "id") |> 
   nrow()
@@ -292,8 +292,9 @@ mci_df =
 
 The resulting `mci_df` dataset is a combination of the `mci_baseline_df` and the `mci_amyloid` datasets where only participants who appear in both datasets are retained. To do this, the `inner_join()` function was applied to both, with the `id` variable anchoring the datasets to one another. Altogether, the `mci_df` dataset has `r nrow(mci_df)` rows and `r ncol(mci_df)` columns. Its column variables include `r paste(names(mci_df), collapse = ", ")`.
 
-## Exporting result as a csv to my github data directory
+## Exporting result as a CSV to my Github data directory
 
 ```{r exporting_combined_csv, message = F}
+# exporting the resulting mci_df dataset as a CSV to my Github data directory
 write_csv(mci_df, "p8105_hw2_mts2203_files/mci_df.csv")
 ```
